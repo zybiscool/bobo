@@ -100,12 +100,17 @@ class Operation:
                 self.gameover()
 
     # 给猫身上色并且导入图片
-    def darw_color(self, cat, fish, screen, catimage, fishimage):
-        x = random.randint(1, 255)
-        y = random.randint(1, 255)
-        z = random.randint(1, 255)
-        color = (x, y, z)
+    def darw_color(self, cat, fish, screen, catimage, fishimage,x,y,z):
+
         for position in cat.catbody:
+            if x < 250:
+                x += 4
+            if y < 250:
+                y += 4
+            if z < 250:
+                z += 4
+
+            color = (x, y, z)
             pygame.draw.rect(screen, color, Rect(position[0], position[1], 20, 20))
             screen.blit(catimage, (cat.cathead[0], cat.cathead[1]))
             screen.blit(fishimage, (fish.fishbody[0], fish.fishbody[1]))
@@ -213,7 +218,9 @@ def main():
     catimage = pygame.image.load("mm.png")
     fishimage = pygame.image.load("yu.png")
     basicfont = pygame.font.Font('ziti.ttf', 25)
-
+    x = random.randint(20, 120)
+    y = random.randint(20, 120)
+    z = random.randint(20, 120)
 
     while True:
         screen.fill(black)  # 填充背景
@@ -226,7 +233,7 @@ def main():
         # o.eat_myself(cat) # 删减吃自己会死
         o.collision(cat)  # 判断是否碰撞边界 碰撞改变属性switch——>1
         o.showgameoverscreen(screen)  # 判断switch为1时候结束游戏,展示结束窗口
-        o.darw_color(cat, fish, screen, catimage, fishimage)  # 填充猫身颜色和填入猫头和鱼的图片
+        o.darw_color(cat, fish, screen, catimage, fishimage,x,y,z)  # 填充猫身颜色和填入猫头和鱼的图片
         o.drawscore(screen, basicfont)  # 分数模块
         o.drawspeed(screen, basicfont)  # 速度模块
         pygame.display.flip()
