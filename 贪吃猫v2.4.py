@@ -8,6 +8,8 @@ darkgray = (40, 40, 40)
 mint = (102, 249, 207)
 mint2 = (131,175,155)
 skyblue = (38,188,213)
+gold = (254,242,58)
+gray = (143,143,143)
 
 
 # 猫类
@@ -160,13 +162,15 @@ class Operation:
             del self.history_score[-1]
             self.score_save()
 
+
+
             # 分数显示模块
             historyscoreFont = pygame.font.Font("ziti.ttf",30)
             historysocreSurf = historyscoreFont.render\
                 ("Histroy Score：First - %s  Second - %s  Third - %s"%
                  (self.history_score[0],self.history_score[1],self.history_score[2]),True,mint2)
             historyscoreRect = historysocreSurf.get_rect()
-            historyscoreRect.topright = (790,20)
+            historyscoreRect.midtop = (400,20)
 
             # 游戏结束模块
             gameoverFont = pygame.font.Font("ziti.ttf", 100)
@@ -178,6 +182,29 @@ class Operation:
             reminderSurf = reminderFont.render("(按Esc退出)", True, white)
             reminderRect = reminderSurf.get_rect()
             reminderRect.midtop = (600, 460)
+
+            # 得分显示
+            def func1(x=400,y=100,size=40):
+                socreFont = pygame.font.Font("ziti.ttf",size)
+                socreSurf = socreFont.render("本次得分：%s" % (self.score), True, gray)
+                scoreRect = socreSurf.get_rect()
+                scoreRect.midtop = (x, y)
+                screen.blit(socreSurf, scoreRect)
+
+            # 新纪录显示
+            def func2():
+                newrecordFont = pygame.font.Font("ziti.ttf",50)
+                newrecordSurf = newrecordFont.render("NewRecord!",True,gold)
+                newrecordRect = newrecordSurf.get_rect()
+                newrecordRect.midtop = (400,100)
+                screen.blit(newrecordSurf, newrecordRect)
+
+            # 判断是否超过历史记录
+            if self.score > self.history_score[1]:
+                func2()
+                func1(400,160,30)
+            else:
+                func1()
 
             screen.blit(historysocreSurf,historyscoreRect)
             screen.blit(gameoverSurf, gameoverRcet)
