@@ -1,7 +1,7 @@
-import pygame, sys, random, os, pickle
+import pygame, sys, random, os, pickle, time
 from pygame.locals import *
 
-global basicfont
+
 black = (0, 0, 0)
 white = (255, 255, 255)
 darkgray = (40, 40, 40)
@@ -10,6 +10,7 @@ mint2 = (131,175,155)
 skyblue = (38,188,213)
 gold = (254,242,58)
 gray = (143,143,143)
+
 
 
 # 猫类
@@ -29,12 +30,12 @@ class Fish:
 
 # 操作类
 class Operation:
-    def __init__(self, direction="right", change="right", speednum=8, score=0, switch=0):
+    def __init__(self, direction="right", change="right", speednum=8, score=0):
         self.direction = direction
         self.change = change
         self.speednum = speednum
         self.score = score
-        self.switch = switch
+        self.switch = 0
 
 
     # 游戏结束退出
@@ -123,6 +124,8 @@ class Operation:
         if cat.cathead[0] == 800 or cat.cathead[0] == 0 \
                 or cat.cathead[1] == 600 or cat.cathead[1] == 0:
             self.switch = 1
+            return False
+
 
     # 得分显示
     def drawscore(self, screen, basicfont):
@@ -178,10 +181,13 @@ class Operation:
             gameoverRcet = gameoverSurf.get_rect()
             gameoverRcet.midtop = (400, 250)
             # 提示模块
-            reminderFont = pygame.font.Font("ziti.ttf", 40)
-            reminderSurf = reminderFont.render("(按Esc退出)", True, white)
-            reminderRect = reminderSurf.get_rect()
-            reminderRect.midtop = (600, 460)
+            def func3(text,x):
+                reminderFont = pygame.font.Font("ziti.ttf", 40)
+                reminderSurf = reminderFont.render(text, True, white)
+                reminderRect = reminderSurf.get_rect()
+                reminderRect.midtop = (x, 460)
+                screen.blit(reminderSurf, reminderRect)
+
 
             # 得分显示
             def func1(x=400,y=100,size=40):
@@ -206,16 +212,33 @@ class Operation:
             else:
                 func1()
 
+            func3("Exit(按ESC)", 600)
+            func3("Again(按SPACE)", 200)
+
             screen.blit(historysocreSurf,historyscoreRect)
             screen.blit(gameoverSurf, gameoverRcet)
-            screen.blit(reminderSurf, reminderRect)
+
             pygame.display.update()
 
             while True:
                 for event in pygame.event.get():
-                    if event.type == KEYUP:
+                    if event.type == KEYDOWN:
                         if event.key == K_ESCAPE:
                             self.gameover()
+                        if event.key == K_SPACE:
+                            time.sleep(1)
+                            os.execl(sys.executable,"python",sys.argv[0])
+                #             # self.switch = 0
+                #             return False
+                #     if False:
+                #         return False
+                # if False:
+                #     break
+
+
+
+
+
 
 
 # 画网格
@@ -235,6 +258,7 @@ def myname(screen):
 
 # 主程序
 def main():
+
     pygame.init()
     cat = Cat()
     fish = Fish()
@@ -248,6 +272,8 @@ def main():
     x = random.randint(20, 120)
     y = random.randint(20, 120)
     z = random.randint(20, 120)
+    # switch = 0
+
 
     while True:
         screen.fill(black)  # 填充背景
@@ -258,13 +284,16 @@ def main():
         o.change_cathead(cat)  # 改变猫头的方向(坐标)
         o.eat_fish(cat, fish)  # 判断吃鱼
         # o.eat_myself(cat) # 删减吃自己会死
-        o.collision(cat)  # 判断是否碰撞边界 碰撞改变属性switch——>1
-        o.showgameoverscreen(screen)  # 判断switch为1时候结束游戏,展示结束窗口
+        # o.collision(cat)  # 判断是否碰撞边界 碰撞改变属性switch——>1
+        if o.collision(cat) == False:
+            break
         o.darw_color(cat, fish, screen, catimage, fishimage,x,y,z)  # 填充猫身颜色和填入猫头和鱼的图片
         o.drawscore(screen, basicfont)  # 分数模块
         o.drawspeed(screen, basicfont)  # 速度模块
         pygame.display.flip()
         speed.tick(o.speednum)
+    o.showgameoverscreen(screen)  # 判断switch为1时候结束游戏,展示结束窗口
+
 
 
 if __name__ == '__main__':
