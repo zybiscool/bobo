@@ -1,4 +1,4 @@
-import pygame, sys, random, os, pickle, time
+import pygame, sys, random, os, pickle
 from pygame.locals import *
 
 
@@ -226,7 +226,6 @@ class Operation:
                         if event.key == K_ESCAPE:
                             self.gameover()
                         if event.key == K_SPACE:
-                            time.sleep(1)
                             os.execl(sys.executable,"python",sys.argv[0])
                 #             # self.switch = 0
                 #             return False
