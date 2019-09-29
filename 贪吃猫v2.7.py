@@ -12,7 +12,6 @@ gold = (254,242,58)
 gray = (143,143,143)
 
 
-
 # 猫类
 class Cat:
     def __init__(self, cathead=[100, 100], catbody=[[100, 100], [80, 100], [60, 100]]):
@@ -37,11 +36,22 @@ class Operation:
         self.score = score
         self.switch = 0
 
-
     # 游戏结束退出
     def gameover(self):
         pygame.quit()
         sys.exit()
+
+    # 暂停功能
+    def pause(self):
+        i = True
+        while i:
+            for event in pygame.event.get():
+                if event.type == KEYDOWN:
+                    if event.key == K_SPACE:
+                        i = False
+                    if event.key == K_ESCAPE:
+                        self.gameover()
+
 
     # 得到一个改变的方向
     def get_change(self):
@@ -57,6 +67,9 @@ class Operation:
                     self.change = "right"
                 if event.key == K_ESCAPE:
                     self.gameover()
+                if event.key == K_SPACE:
+                    self.pause()
+
 
     # 确定方向
     def confirm_direction(self):
@@ -87,9 +100,17 @@ class Operation:
     def eat_fish(self, cat, fish):
         if cat.cathead == fish.fishbody:
             cat.catbody.insert(0, list(cat.cathead))
-            x = random.randrange(2, 39)
-            y = random.randrange(2, 19)
-            newfishbody = [int(x * 20), int(y * 20)]
+            # 判断是否在得分框与作者框内生成 是则重新随机
+            pygame.mixer.Sound("sorce.wav").play()
+            while True:
+                x = random.randrange(1, 39)
+                y = random.randrange(1, 19)
+                if (int(x*20)>= 660 and int(y*20)<=80) or (int(x*20)<120 and int(y*20)>360):
+                    return
+                else:
+                    newfishbody = [int(x*20), int(y*20)]
+                    break
+
             fish.fishbody = newfishbody
             self.speednum += 0.2
             self.score += 1
@@ -97,10 +118,10 @@ class Operation:
             self.remove(cat)
 
     # 判断头是否与后面的身子重叠 如果相等则退出游戏
-    def eat_myself(self, cat):
-        for i in cat.catbody[1:]:
-            if cat.cathead == i:
-                self.gameover()
+    # def eat_myself(self, cat):
+    #     for i in cat.catbody[1:]:
+    #         if cat.cathead == i:
+    #             self.gameover()
 
     # 给猫身上色并且导入图片
     def darw_color(self, cat, fish, screen, catimage, fishimage,x,y,z):
@@ -125,7 +146,6 @@ class Operation:
                 or cat.cathead[1] == 600 or cat.cathead[1] == 0:
             self.switch = 1
             return False
-
 
     # 得分显示
     def drawscore(self, screen, basicfont):
@@ -159,6 +179,9 @@ class Operation:
     # 结束页面显示
     def showgameoverscreen(self, screen):
         if self.switch == 1:
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load("over.mp3")
+            pygame.mixer.music.play(1,0.0)
             self.score_load()
             self.history_score.append(self.score)
             self.history_score.sort(reverse = True)
@@ -227,18 +250,6 @@ class Operation:
                             self.gameover()
                         if event.key == K_SPACE:
                             os.execl(sys.executable,"python",sys.argv[0])
-                #             # self.switch = 0
-                #             return False
-                #     if False:
-                #         return False
-                # if False:
-                #     break
-
-
-
-
-
-
 
 # 画网格
 def grid(screen):
@@ -259,6 +270,7 @@ def myname(screen):
 def main():
 
     pygame.init()
+    pygame.mixer.init()
     cat = Cat()
     fish = Fish()
     o = Operation()
@@ -271,7 +283,9 @@ def main():
     x = random.randint(20, 120)
     y = random.randint(20, 120)
     z = random.randint(20, 120)
-    # switch = 0
+    pygame.mixer.music.load("bgm.mp3")
+    pygame.mixer.music.play(-1,0.0)
+
 
 
     while True:
@@ -283,10 +297,9 @@ def main():
         o.change_cathead(cat)  # 改变猫头的方向(坐标)
         o.eat_fish(cat, fish)  # 判断吃鱼
         # o.eat_myself(cat) # 删减吃自己会死
-        # o.collision(cat)  # 判断是否碰撞边界 碰撞改变属性switch——>1
         if o.collision(cat) == False:
             break
-        o.darw_color(cat, fish, screen, catimage, fishimage,x,y,z)  # 填充猫身颜色和填入猫头和鱼的图片
+        o.darw_color(cat, fish, screen, catimage, fishimage, x, y, z)  # 填充猫身颜色和填入猫头和鱼的图片
         o.drawscore(screen, basicfont)  # 分数模块
         o.drawspeed(screen, basicfont)  # 速度模块
         pygame.display.flip()
